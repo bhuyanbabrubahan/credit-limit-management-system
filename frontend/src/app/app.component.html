@@ -1,0 +1,182 @@
+<div class="app-shell">
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <div class="brand">
+      <div class="brand-mark">CL</div>
+      <div>
+        <b>CrediFlow</b>
+        <small>LIMIT MANAGEMENT</small>
+      </div>
+      <button class="close-menu" (click)="sidebarOpen = false">×</button>
+    </div>
+
+    <div class="workspace">
+      <span class="workspace-dot"></span>
+      <div>
+        <b>Credit Limit workspace</b>
+        <small>Local development</small>
+      </div>
+      <span class="chevron">⌄</span>
+    </div>
+
+    <ng-container
+      *ngFor="let group of ['WORKSPACE', 'MANAGEMENT', 'OPERATIONS']"
+    >
+      <p class="nav-label">{{ group }}</p>
+
+      <button
+        class="nav-item"
+        *ngFor="let item of navItems"
+        [hidden]="item.group !== group"
+        [class.active]="page === item.id"
+        (click)="navigate(item.id)"
+      >
+        <span class="nav-icon">{{ item.icon }}</span>
+        {{ item.label }}
+        <span class="active-mark" *ngIf="page === item.id"></span>
+      </button>
+    </ng-container>
+
+    <div class="sidebar-bottom">
+      <div class="help-icon">?</div>
+      <div>
+        <b>Need help?</b>
+        <small>Check project quickstart</small>
+      </div>
+    </div>
+
+    <div class="profile">
+      <span class="profile-avatar">AD</span>
+      <div>
+        <b>Administrator</b>
+        <small>Local user</small>
+      </div>
+      <span class="more">•••</span>
+    </div>
+  </aside>
+
+  <div
+    class="mobile-backdrop"
+    *ngIf="sidebarOpen"
+    (click)="sidebarOpen = false"
+  ></div>
+
+  <main class="main-area">
+    <header class="topbar">
+      <div class="top-left">
+        <button class="menu-toggle" (click)="sidebarOpen = !sidebarOpen">
+          ☰
+        </button>
+
+        <span class="breadcrumb">
+          Workspace /
+          <b>
+            {{
+              page === "dashboard"
+                ? "Overview"
+                : page === "accounts"
+                  ? "Credit accounts"
+                  : page === "customers"
+                    ? "Customers"
+                    : page === "policies"
+                      ? "Policy booking"
+                      : "Payments"
+            }}
+          </b>
+        </span>
+      </div>
+
+      <div class="top-actions">
+        <span class="environment"><i></i> LOCAL / TEST</span>
+
+        <button class="refresh-button" (click)="refresh()" title="Refresh data">
+          ↻ <span>Refresh</span>
+        </button>
+
+        <span class="top-avatar">AD</span>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="alert error-alert" *ngIf="error">
+        <span>!</span>
+        <div>
+          <b>Something went wrong</b>
+          <p>{{ error }}</p>
+        </div>
+        <button (click)="error = ''">×</button>
+      </div>
+
+      <div class="alert success-alert" *ngIf="notice">
+        <span>✓</span>
+        <p>{{ notice }}</p>
+        <button (click)="notice = ''">×</button>
+      </div>
+
+      <div class="demo-note">
+        <span class="note-icon">i</span>
+        <div>
+          <b>Development environment</b>
+          <p>
+            This UI connects to your local Spring Boot API. Payment processing
+            is simulated; no real money is moved.
+          </p>
+        </div>
+        <span class="demo-tag">TEST MODE</span>
+      </div>
+
+      <app-dashboard
+        *ngIf="page === 'dashboard'"
+        [accounts]="accounts"
+        [customers]="customers"
+        [policies]="policies"
+        [transactions]="transactions"
+        [selectedCredit]="selectedCredit"
+        [activeAgentId]="activeAgentId"
+        (openTab)="navigate($any($event))"
+        (lookupCredit)="lookupCredit($event)"
+      ></app-dashboard>
+
+      <app-accounts
+        *ngIf="page === 'accounts'"
+        [accounts]="accounts"
+        [children]="children"
+        [busy]="busy"
+        [error]="error"
+        (createParent)="createParent($event)"
+        (createChild)="createChild($event)"
+        (loadChildren)="loadChildren($event)"
+      ></app-accounts>
+
+      <app-customers
+        *ngIf="page === 'customers'"
+        [customers]="customers"
+        [busy]="busy"
+        (createCustomer)="createCustomer($event)"
+      ></app-customers>
+
+      <app-policies
+        *ngIf="page === 'policies'"
+        [policies]="policies"
+        [customers]="customers"
+        [busy]="busy"
+        [activeAgentId]="activeAgentId"
+        (bookPolicy)="bookPolicy($event)"
+        (payPolicy)="payPolicy($event)"
+        (loadPolicies)="loadPolicies($event)"
+      ></app-policies>
+
+      <app-payments
+        *ngIf="page === 'payments'"
+        [transactions]="transactions"
+        [busy]="busy"
+        (loadAgent)="loadTransactions($event)"
+        (loadCustomer)="loadTransactionsForCustomer($event)"
+      ></app-payments>
+
+      <footer>
+        <span>© 2026 CrediFlow · Credit Limit Management System</span>
+        <span>Spring Boot API <i class="footer-dot"></i> Angular UI</span>
+      </footer>
+    </div>
+  </main>
+</div>

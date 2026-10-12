@@ -1,0 +1,193 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ORGANISATION</p>
+    <h2>Credit accounts</h2>
+    <p>Create parent accounts and allocate credit to child agents.</p>
+  </div>
+</div>
+
+<div class="form-grid">
+  <article class="surface">
+    <div class="card-heading">
+      <span class="step">01</span>
+      <div>
+        <h3>Create parent account</h3>
+        <p>Top-level agency or business account</p>
+      </div>
+    </div>
+
+    <form #pf="ngForm" (ngSubmit)="submitParent()">
+      <label>
+        Username
+        <input
+          name="pusername"
+          [(ngModel)]="parent.username"
+          required
+          maxlength="50"
+          placeholder="e.g. north_agency"
+        />
+      </label>
+
+      <label>
+        Full name
+        <input
+          name="pname"
+          [(ngModel)]="parent.fullName"
+          required
+          maxlength="100"
+          placeholder="Agency name"
+        />
+      </label>
+
+      <label>
+        Total credit limit (₹)
+        <input
+          name="plimit"
+          type="number"
+          [(ngModel)]="parent.creditLimit"
+          min="0"
+          required
+        />
+      </label>
+
+      <label>
+        Effective from
+        <input
+          name="pdate"
+          type="date"
+          [(ngModel)]="parent.effectiveFrom"
+          required
+        />
+      </label>
+
+      <button class="primary" type="submit" [disabled]="pf.invalid || busy">
+        Create parent
+      </button>
+    </form>
+  </article>
+
+  <article class="surface">
+    <div class="card-heading">
+      <span class="step violet">02</span>
+      <div>
+        <h3>Create child / agent</h3>
+        <p>Allocate a portion of a parent limit</p>
+      </div>
+    </div>
+
+    <form #cf="ngForm" (ngSubmit)="submitChild()">
+      <label>
+        Parent account ID
+        <input
+          name="cparent"
+          type="number"
+          [(ngModel)]="child.parentId"
+          min="1"
+          required
+          placeholder="ID from parent list"
+        />
+      </label>
+
+      <label>
+        Username
+        <input
+          name="cusername"
+          [(ngModel)]="child.username"
+          required
+          maxlength="50"
+          placeholder="e.g. agent_rahul"
+        />
+      </label>
+
+      <label>
+        Full name
+        <input
+          name="cname"
+          [(ngModel)]="child.fullName"
+          required
+          maxlength="100"
+          placeholder="Agent name"
+        />
+      </label>
+
+      <label>
+        Allocated credit limit (₹)
+        <input
+          name="climit"
+          type="number"
+          [(ngModel)]="child.creditLimit"
+          min="0.01"
+          required
+        />
+      </label>
+
+      <button class="primary" type="submit" [disabled]="cf.invalid || busy">
+        Create child
+      </button>
+    </form>
+  </article>
+</div>
+
+<article class="surface table-card">
+  <div class="table-heading">
+    <div>
+      <h3>Loaded accounts</h3>
+      <p>Accounts appear after successful creation or credit lookup.</p>
+    </div>
+
+    <div class="inline-search">
+      <input type="number" [(ngModel)]="parentLookup" placeholder="Parent ID" />
+
+      <button
+        class="secondary"
+        type="button"
+        [disabled]="busy"
+        (click)="lookupChildren()"
+      >
+        Load children
+      </button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Account</th>
+          <th>Role</th>
+          <th>Parent ID</th>
+          <th>Limit</th>
+          <th>Used</th>
+          <th>Available</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let a of uniqueAccounts">
+          <td>#{{ a.id }}</td>
+
+          <td>
+            <b>{{ a.fullName }}</b>
+            <small>&#64;{{ a.username }}</small>
+          </td>
+
+          <td>
+            <span class="pill">{{ a.role }}</span>
+          </td>
+
+          <td>{{ a.parentId || "—" }}</td>
+          <td>{{ a.creditLimit | inr }}</td>
+          <td>{{ a.usedLimit | inr }}</td>
+          <td class="positive">{{ a.availableLimit | inr }}</td>
+        </tr>
+
+        <tr *ngIf="!uniqueAccounts.length">
+          <td colspan="7" class="empty">
+            No accounts yet. Create a parent account above.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</article>

@@ -1,0 +1,182 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">POLICY OPERATIONS</p>
+    <h2>Policy booking</h2>
+    <p>
+      Book a policy against a customer and charge the agent's available credit.
+    </p>
+  </div>
+</div>
+
+<div class="layout">
+  <article class="surface create-card">
+    <div class="card-heading">
+      <span class="step">＋</span>
+      <div>
+        <h3>New policy</h3>
+        <p>Confirm IDs and policy dates before submitting.</p>
+      </div>
+    </div>
+
+    <form #f="ngForm" (ngSubmit)="submit()">
+      <label>
+        Agent ID *
+        <input
+          name="agent"
+          type="number"
+          min="1"
+          [(ngModel)]="form.agentId"
+          required
+        />
+      </label>
+
+      <label>
+        Customer ID *
+        <input
+          name="customer"
+          type="number"
+          min="1"
+          [(ngModel)]="form.customerId"
+          required
+        />
+      </label>
+
+      <label>
+        Premium amount (₹) *
+        <input
+          name="premium"
+          type="number"
+          min="0.01"
+          [(ngModel)]="form.premiumAmount"
+          required
+        />
+      </label>
+
+      <label>
+        Quotation number *
+        <input
+          name="quotation"
+          [(ngModel)]="form.quotationNumber"
+          required
+          readonly
+        />
+      </label>
+
+      <label>
+        ACD number *
+        <input name="acd" [(ngModel)]="form.acdNumber" required readonly />
+      </label>
+
+      <label>
+        Policy start date *
+        <input
+          name="start"
+          type="date"
+          [(ngModel)]="form.policyStartDate"
+          required
+        />
+      </label>
+
+      <label>
+        Policy end date *
+        <input
+          name="end"
+          type="date"
+          [(ngModel)]="form.policyEndDate"
+          required
+        />
+      </label>
+
+      <label>
+        Next due date *
+        <input name="due" type="date" [(ngModel)]="form.nextDueDate" required />
+      </label>
+
+      <button class="primary" type="submit" [disabled]="f.invalid || busy">
+        Book policy
+      </button>
+    </form>
+  </article>
+
+  <article class="surface policy-list">
+    <div class="list-heading">
+      <div>
+        <h3>Policy register</h3>
+        <p>Policies returned for the selected agent</p>
+      </div>
+
+      <div class="inline">
+        <input
+          type="number"
+          [(ngModel)]="agentLookup"
+          min="1"
+          placeholder="Agent ID"
+        />
+
+        <button
+          class="secondary"
+          type="button"
+          [disabled]="busy"
+          (click)="load()"
+        >
+          Load
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Policy</th>
+            <th>Customer</th>
+            <th>Premium</th>
+            <th>Outstanding</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let p of uniquePolicies">
+            <td>
+              <b>{{ p.policyNumber }}</b>
+              <small>{{ p.quotationNumber }}</small>
+            </td>
+
+            <td>
+              {{ p.customerName }}
+              <small>#{{ p.customerId }}</small>
+            </td>
+
+            <td>{{ p.premiumAmount | inr }}</td>
+
+            <td class="due">{{ p.outstanding | inr }}</td>
+
+            <td>
+              <span class="pill">{{ p.status }}</span>
+            </td>
+
+            <td>
+              <button
+                class="pay-button"
+                type="button"
+                [disabled]="p.outstanding <= 0 || busy"
+                (click)="payPolicy.emit(p)"
+              >
+                Pay outstanding
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="!uniquePolicies.length">
+            <td colspan="6" class="empty">
+              No policies loaded. Enter an agent ID and select Load, or book a
+              policy.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</div>

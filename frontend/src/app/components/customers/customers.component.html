@@ -1,0 +1,103 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">CUSTOMER MANAGEMENT</p>
+    <h2>Customers</h2>
+    <p>Maintain policyholder profiles and contact details.</p>
+  </div>
+  <span class="count">{{ customers.length }} records</span>
+</div>
+<div class="layout">
+  <article class="surface create-card">
+    <div class="card-heading">
+      <span class="step">＋</span>
+      <div>
+        <h3>Add customer</h3>
+        <p>Fields marked with * are required</p>
+      </div>
+    </div>
+    <form #f="ngForm" (ngSubmit)="submit()">
+      <label
+        >Customer code *<input
+          name="code"
+          [(ngModel)]="form.customerCode"
+          required
+          maxlength="30"
+          placeholder="CUS-1001"
+      /></label>
+      <label
+        >Full name *<input
+          name="name"
+          [(ngModel)]="form.fullName"
+          required
+          maxlength="100"
+          placeholder="Customer full name"
+      /></label>
+      <label
+        >Email address *<input
+          name="email"
+          [(ngModel)]="form.email"
+          required
+          email
+          type="email"
+          placeholder="name@example.com"
+      /></label>
+      <label
+        >Mobile number *<input
+          name="mobile"
+          [(ngModel)]="form.mobile"
+          required
+          maxlength="20"
+          placeholder="+91 ..."
+      /></label>
+      <label
+        >Date of birth *<input
+          name="dob"
+          [(ngModel)]="form.dateOfBirth"
+          required
+          type="date"
+      /></label>
+      <label class="full"
+        >Address *<textarea
+          name="address"
+          [(ngModel)]="form.address"
+          required
+          maxlength="250"
+          rows="3"
+          placeholder="Street, city, PIN"
+        ></textarea>
+      </label>
+      <button class="primary" type="submit" [disabled]="f.invalid || busy">
+        Save customer
+      </button>
+    </form>
+  </article>
+  <article class="surface list-card">
+    <div class="list-heading">
+      <div>
+        <h3>Customer directory</h3>
+        <p>Search loaded customer records</p>
+      </div>
+      <input
+        class="search"
+        [(ngModel)]="search"
+        placeholder="Search name, code, email..."
+      />
+    </div>
+    <div class="customer-list">
+      <div class="customer-row" *ngFor="let c of filtered">
+        <span class="avatar">{{ c.fullName.charAt(0) }}</span>
+        <div class="customer-main">
+          <b>{{ c.fullName }}</b
+          ><small>{{ c.customerCode }} · {{ c.email }}</small
+          ><small>{{ c.mobile }}</small>
+        </div>
+        <span class="state" [class.inactive]="c.status !== 'ACTIVE'">{{
+          c.status
+        }}</span>
+      </div>
+      <div class="empty" *ngIf="!filtered.length">
+        No matching customers. Create one using the form.
+      </div>
+    </div>
+  </article>
+</div>

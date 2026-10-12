@@ -1,0 +1,147 @@
+<section class="welcome">
+  <div>
+    <p class="eyebrow">OVERVIEW / CREDIT OPERATIONS</p>
+    <h2>Good to see you.</h2>
+    <p>
+      Monitor credit exposure, policy bookings and payment activity from one
+      place.
+    </p>
+  </div>
+  <button class="primary" (click)="openTab.emit('policies')">
+    <span class="plus">＋</span>
+    Book a policy
+  </button>
+</section>
+<div class="metric-grid">
+  <article class="metric">
+    <span class="metric-icon indigo">₹</span
+    ><span class="metric-label">Total credit limit</span
+    ><strong>{{ totalLimit | inr }}</strong
+    ><small>Across loaded accounts</small>
+  </article>
+  <article class="metric">
+    <span class="metric-icon orange">↗</span
+    ><span class="metric-label">Credit utilised</span
+    ><strong>{{ usedLimit | inr }}</strong
+    ><small>Used / committed credit</small>
+  </article>
+  <article class="metric">
+    <span class="metric-icon green">✓</span
+    ><span class="metric-label">Available credit</span
+    ><strong>{{ availableLimit | inr }}</strong
+    ><small>Current loaded balance</small>
+  </article>
+  <article class="metric">
+    <span class="metric-icon blue">▤</span
+    ><span class="metric-label">Active records</span
+    ><strong>{{ customers.length + policies.length }}</strong
+    ><small
+      >{{ customers.length }} customers · {{ policies.length }} policies</small
+    >
+  </article>
+</div>
+<div class="content-grid">
+  <article class="surface">
+    <div class="section-head">
+      <div>
+        <h3>Credit accounts</h3>
+        <p>Quick view of account limits</p>
+      </div>
+      <button class="text-button" (click)="openTab.emit('accounts')">
+        Manage accounts →
+      </button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Account</th>
+            <th>Role</th>
+            <th>Limit</th>
+            <th>Available</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let account of uniqueAccounts | slice: 0 : 5">
+            <td>
+              <div class="person">
+                <span class="avatar">{{ account.fullName.charAt(0) }}</span>
+                <div>
+                  <b>{{ account.fullName }}</b
+                  ><small
+                    >&#64;{{ account.username }} · #{{ account.id }}</small
+                  >
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="pill">{{ account.role }}</span>
+            </td>
+            <td>{{ account.creditLimit | inr }}</td>
+            <td class="positive">{{ account.availableLimit | inr }}</td>
+            <td>
+              <button
+                class="icon-button"
+                title="View credit"
+                (click)="lookupCredit.emit(account.id)"
+              >
+                ↗
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!accounts.length">
+            <td colspan="5" class="empty">
+              No accounts loaded yet. Create a parent account to begin.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="credit-result" *ngIf="selectedCredit">
+      <b>{{ selectedCredit.username }} · credit summary</b>
+      <div class="credit-numbers">
+        <span
+          >Total <strong>{{ selectedCredit.totalLimit | inr }}</strong></span
+        ><span
+          >Used <strong>{{ selectedCredit.usedLimit | inr }}</strong></span
+        ><span
+          >Available
+          <strong>{{ selectedCredit.availableLimit | inr }}</strong></span
+        >
+      </div>
+    </div>
+  </article>
+  <article class="surface activity">
+    <div class="section-head">
+      <div>
+        <h3>Recent payments</h3>
+        <p>Latest transactions for agent {{ activeAgentId }}</p>
+      </div>
+      <button class="text-button" (click)="openTab.emit('payments')">
+        View all →
+      </button>
+    </div>
+    <div class="activity-row" *ngFor="let txn of transactions | slice: 0 : 5">
+      <span class="activity-symbol">₹</span>
+      <div class="activity-info">
+        <b>{{ txn.policyNumber || txn.transactionId }}</b
+        ><small>{{
+          txn.paymentDate
+            ? (txn.paymentDate | date: "mediumDate")
+            : "Date unavailable"
+        }}</small>
+      </div>
+      <div class="activity-amount">
+        <b>{{ txn.amount | inr }}</b
+        ><span class="status" [class.good]="txn.status === 'SUCCESS'">{{
+          txn.status
+        }}</span>
+      </div>
+    </div>
+    <div class="empty" *ngIf="!transactions.length">
+      No payment activity returned. Try refreshing or choose an agent/customer
+      ID in Payments.
+    </div>
+  </article>
+</div>

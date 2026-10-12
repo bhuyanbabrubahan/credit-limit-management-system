@@ -1,0 +1,97 @@
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">PAYMENT RECONCILIATION</p>
+    <h2>Payments & transactions</h2>
+    <p>
+      Review payment attempts returned by the backend. Payments are simulated in
+      this demo.
+    </p>
+  </div>
+</div>
+<div class="summary-grid">
+  <article class="summary">
+    <span>Transactions loaded</span><b>{{ transactions.length }}</b>
+  </article>
+  <article class="summary">
+    <span>Successful payments</span><b class="green">{{ successCount }}</b>
+  </article>
+  <article class="summary">
+    <span>Loaded transaction value</span><b>{{ totalValue | inr }}</b>
+  </article>
+</div>
+<article class="surface">
+  <div class="filter-bar">
+    <div>
+      <h3>Transaction ledger</h3>
+      <p>Choose whether to query by agent or customer.</p>
+    </div>
+    <div class="filters">
+      <select [(ngModel)]="mode">
+        <option value="agent">By agent</option>
+        <option value="customer">By customer</option></select
+      ><input
+        *ngIf="mode === 'agent'"
+        type="number"
+        min="1"
+        [(ngModel)]="agentId"
+        placeholder="Agent ID"
+      /><input
+        *ngIf="mode === 'customer'"
+        type="number"
+        min="1"
+        [(ngModel)]="customerId"
+        placeholder="Customer ID"
+      /><button class="primary" (click)="load()" [disabled]="busy">
+        Load transactions
+      </button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Policy</th>
+          <th>Customer</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Gateway reference</th>
+          <th>Payment date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let t of transactions">
+          <td>
+            <b>{{ t.transactionId }}</b
+            ><small>Agent #{{ t.agentId }}</small>
+          </td>
+          <td>{{ t.policyNumber }}</td>
+          <td>{{ t.customerCode || "—" }}</td>
+          <td class="amount">{{ t.amount | inr }}</td>
+          <td>
+            <span
+              class="status"
+              [class.success]="t.status === 'SUCCESS'"
+              [class.failed]="t.status === 'FAILED'"
+              >{{ t.status }}</span
+            >
+          </td>
+          <td>
+            {{ t.gatewayReference || "—"
+            }}<small *ngIf="t.failureReason">{{ t.failureReason }}</small>
+          </td>
+          <td>{{ t.paymentDate ? (t.paymentDate | date: "medium") : "—" }}</td>
+        </tr>
+        <tr *ngIf="!transactions.length">
+          <td colspan="7" class="empty">
+            No transactions loaded. Select a query and click Load transactions.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</article>
+<div class="notice">
+  <b>Demo safety note:</b> The current backend uses a dummy payment gateway. Do
+  not enter real card, bank, or customer payment credentials.
+</div>
