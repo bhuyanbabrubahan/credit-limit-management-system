@@ -139,4 +139,13 @@ public class UserAccount extends BaseEntity {
     public void setEffectiveFrom(LocalDate effectiveFrom) {
         this.effectiveFrom = effectiveFrom;
     }
+
+	@Override
+	public String toString() {
+		return "UserAccount [username=" + username + ", fullName=" + fullName + ", role=" + role + ", parent=" + parent
+				+ ", creditLimit=" + creditLimit + ", allocatedToChildren=" + allocatedToChildren + ", usedLimit="
+				+ usedLimit + ", active=" + active + ", effectiveFrom=" + effectiveFrom + "]";
+	}
+    
+    
 }

@@ -1,16 +1,18 @@
 package com.example.creditlimit.service.impl;
 
-import com.example.creditlimit.dto.*;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.creditlimit.dto.CreateCustomerRequest;
+import com.example.creditlimit.dto.CustomerResponse;
 import com.example.creditlimit.entity.Customer;
 import com.example.creditlimit.exception.BusinessException;
 import com.example.creditlimit.mapper.DtoMapper;
 import com.example.creditlimit.repository.CustomerRepository;
 import com.example.creditlimit.service.CustomerService;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -48,13 +50,11 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(readOnly = true)
     public CustomerResponse get(Long id) {
 
-        return mapper.customer(
-                customers.findById(id)
-                        .orElseThrow(() ->
-                                new BusinessException(
-                                        "Customer not found: " + id,
-                                        org.springframework.http.HttpStatus.NOT_FOUND)));
-    }
+		var c = customers.findById(id)
+				.orElseThrow(() -> new BusinessException("Customer not found: " + id, HttpStatus.NOT_FOUND));
+		
+		return mapper.customer(c);
+    } 
 
     @Override
     @Transactional(readOnly = true)

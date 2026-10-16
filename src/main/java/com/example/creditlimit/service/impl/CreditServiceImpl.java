@@ -77,6 +77,7 @@ public class CreditServiceImpl implements CreditService {
         p.setCreditLimit(r.creditLimit());
         p.setEffectiveFrom(r.effectiveFrom());
 
+        System.out.println("Parent before save: " + p);
         return mapper.account(users.save(p));
     }
 
@@ -108,6 +109,8 @@ public class CreditServiceImpl implements CreditService {
         child.setCreditLimit(r.creditLimit());
         child.setEffectiveFrom(parent.getEffectiveFrom());
 
+        System.out.println("Child before save: " + child);
+        
         parent.setAllocatedToChildren(
                 parent.getAllocatedToChildren().add(r.creditLimit()));
 
@@ -122,6 +125,8 @@ public class CreditServiceImpl implements CreditService {
 
         UserAccount u = user(id);
 
+        System.out.println("User account: " + u);
+        
         return new CreditResponse(
                 u.getId(),
                 u.getUsername(),
@@ -166,6 +171,9 @@ public class CreditServiceImpl implements CreditService {
                                 "Customer not found: " + r.customerId(),
                                 HttpStatus.NOT_FOUND));
 
+        System.out.println("Customer: " + customer);
+        System.out.println("Agent: " + agent);
+        
         if (r.policyEndDate().isBefore(r.policyStartDate()))
             throw new BusinessException(
                     "Policy end date cannot be before start date");
@@ -221,7 +229,8 @@ public class CreditServiceImpl implements CreditService {
                         new BusinessException(
                                 "Policy not found: " + r.policyId(),
                                 HttpStatus.NOT_FOUND));
-
+        System.out.println("Policy: " + policy);
+        
 		var existing = transactions.findByIdempotencyKey(r.idempotencyKey());
 
         if (existing.isPresent()) {
@@ -266,7 +275,9 @@ public class CreditServiceImpl implements CreditService {
         tx.setAmount(due);
         tx.setPaidAmount(BigDecimal.ZERO);
         tx.setStatus(TransactionStatus.PENDING);
-
+        
+        System.out.println("Successful transaction: " + tx);
+        
         transactions.save(tx);
 
         PaymentGatewayResult gateway = paymentGateway.pay(

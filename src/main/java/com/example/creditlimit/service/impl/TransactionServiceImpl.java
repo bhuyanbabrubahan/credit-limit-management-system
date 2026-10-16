@@ -1,14 +1,15 @@
 package com.example.creditlimit.service.impl;
 
-import com.example.creditlimit.dto.TransactionResponse;
-import com.example.creditlimit.mapper.DtoMapper;
-import com.example.creditlimit.repository.PaymentTransactionRepository;
-import com.example.creditlimit.service.TransactionService;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.example.creditlimit.dto.TransactionResponse;
+import com.example.creditlimit.entity.PaymentTransaction;
+import com.example.creditlimit.mapper.DtoMapper;
+import com.example.creditlimit.repository.PaymentTransactionRepository;
+import com.example.creditlimit.service.TransactionService;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -28,9 +29,16 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     public List<TransactionResponse> byCustomer(Long customerId) {
 
-        return transactions
-                .findByCustomerIdOrderByCreatedAtDesc(customerId)
-                .stream()
+        List<PaymentTransaction> transactionList =
+                transactions.findByCustomerIdOrderByCreatedAtDesc(customerId);
+
+        // Print all transactions for the customer
+        System.out.println("Transactions for Customer ID: " + customerId);
+
+        transactionList.forEach(transaction ->
+                System.out.println("Transaction Entity: " + transaction));
+
+        return transactionList.stream()
                 .map(mapper::transaction)
                 .toList();
     }
@@ -39,9 +47,16 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional(readOnly = true)
     public List<TransactionResponse> byAgent(Long agentId) {
 
-        return transactions
-                .findByAgentIdOrderByCreatedAtDesc(agentId)
-                .stream()
+        List<PaymentTransaction> transactionList =
+                transactions.findByAgentIdOrderByCreatedAtDesc(agentId);
+
+        // Print all transactions for the agent
+        System.out.println("Transactions for Agent ID: " + agentId);
+
+        transactionList.forEach(transaction ->
+                System.out.println("Transaction Entity: " + transaction));
+
+        return transactionList.stream()
                 .map(mapper::transaction)
                 .toList();
     }

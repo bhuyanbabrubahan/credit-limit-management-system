@@ -4,6 +4,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { finalize } from "rxjs";
 
 import { CreditApiService } from "./services/credit-api.service";
+
 import {
   Account,
   Customer,
@@ -18,7 +19,12 @@ import { CustomersComponent } from "./components/customers/customers.component";
 import { PoliciesComponent } from "./components/policies/policies.component";
 import { PaymentsComponent } from "./components/payments/payments.component";
 
-type Page = "dashboard" | "accounts" | "customers" | "policies" | "payments";
+type Page =
+  | "dashboard"
+  | "accounts"
+  | "customers"
+  | "policies"
+  | "payments";
 
 @Component({
   selector: "app-root",
@@ -102,14 +108,16 @@ export class AppComponent implements OnInit {
     this.notice = "";
   }
 
+  // Reload dashboard data.
   refresh(): void {
     this.error = "";
     this.notice = "";
 
-    this.loadAccounts();
     this.loadCustomers();
+    this.loadAccounts();
   }
 
+  // Load accounts and the selected agent's data.
   loadAccounts(): void {
     this.api.getAccounts().subscribe({
       next: (data) => {
@@ -133,10 +141,22 @@ export class AppComponent implements OnInit {
 
         if (this.activeAgentId > 0) {
           this.loadPolicies(this.activeAgentId, false);
-          this.loadTransactions(this.activeAgentId, false);
         } else {
           this.policies = [];
           this.transactions = [];
+        }
+
+        // Refresh the selected credit summary if one is displayed.
+        if (this.selectedCredit) {
+          const accountStillExists = this.accounts.some(
+            (account) => account.id === this.selectedCredit?.userId,
+          );
+
+          if (accountStillExists) {
+            this.loadCreditSummary(this.selectedCredit.userId);
+          } else {
+            this.selectedCredit = null;
+          }
         }
       },
       error: (err) => this.handleError(err),
@@ -157,6 +177,7 @@ export class AppComponent implements OnInit {
 
     if (!Number.isInteger(id) || id <= 0) {
       this.policies = [];
+      this.transactions = [];
       this.activeAgentId = 0;
       return;
     }
@@ -168,13 +189,14 @@ export class AppComponent implements OnInit {
         this.policies = data ?? [];
 
         if (showMessage) {
-          this.notice = `Loaded ${this.policies.length} policies for agent ${id}.`;
+          this.notice =
+            `Loaded ${this.policies.length} policies for agent ${id}.`;
         }
       },
       error: (err) => this.handleError(err),
     });
 
-    // Keep Overview payment information in sync with the selected agent.
+    // Refresh recent payments for the same agent.
     this.loadTransactions(id, false);
   }
 
@@ -193,7 +215,8 @@ export class AppComponent implements OnInit {
         this.transactions = data ?? [];
 
         if (showMessage) {
-          this.notice = `Loaded ${this.transactions.length} transactions for agent ${id}.`;
+          this.notice =
+            `Loaded ${this.transactions.length} transactions for agent ${id}.`;
         }
       },
       error: (err) => this.handleError(err),
@@ -204,7 +227,8 @@ export class AppComponent implements OnInit {
     this.api.getTransactionsByCustomer(id).subscribe({
       next: (data) => {
         this.transactions = data ?? [];
-        this.notice = `Loaded ${this.transactions.length} transactions for customer ${id}.`;
+        this.notice =
+          `Loaded ${this.transactions.length} transactions for customer ${id}.`;
       },
       error: (err) => this.handleError(err),
     });
@@ -214,18 +238,22 @@ export class AppComponent implements OnInit {
     this.api.getChildren(parentId).subscribe({
       next: (data) => {
         this.children = data ?? [];
-        this.notice = `Loaded ${this.children.length} child accounts for parent ${parentId}.`;
+        this.notice =
+          `Loaded ${this.children.length} child accounts for parent ${parentId}.`;
       },
       error: (err) => this.handleError(err),
     });
   }
 
   lookupCredit(id: number): void {
+    this.loadCreditSummary(id);
+  }
+
+  private loadCreditSummary(id: number): void {
     this.api.getCredit(id).subscribe({
       next: (data) => {
         this.selectedCredit = data;
         this.upsertAccountFromCredit(data);
-        this.notice = `Credit summary loaded for account ${id}.`;
       },
       error: (err) => this.handleError(err),
     });
@@ -241,8 +269,11 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: (account) => {
           this.addAccount(account);
-          this.notice = `Parent account created successfully. New account ID: ${account.id}`;
 
+          this.notice =
+            `Parent account created successfully. New account ID: ${account.id}`;
+
+          this.loadAccounts();
           this.lookupCredit(account.id);
         },
         error: (err) => this.handleError(err),
@@ -260,12 +291,16 @@ export class AppComponent implements OnInit {
         next: (account) => {
           this.addAccount(account);
 
-          this.notice = `Child account created successfully. New account ID: ${account.id}`;
+          this.notice =
+            `Child account created successfully. New account ID: ${account.id}`;
 
           this.loadChildren(Number(body.parentId));
-
-          // Refresh accounts to detect newly created agents.
           this.loadAccounts();
+
+          // Refresh the parent credit summary if it is currently selected.
+          if (this.selectedCredit?.userId === Number(body.parentId)) {
+            this.lookupCredit(Number(body.parentId));
+          }
         },
         error: (err) => this.handleError(err),
       });
@@ -282,10 +317,13 @@ export class AppComponent implements OnInit {
         next: (customer) => {
           this.customers = [
             customer,
-            ...this.customers.filter((item) => item.id !== customer.id),
+            ...this.customers.filter(
+              (item) => item.id !== customer.id,
+            ),
           ];
 
-          this.notice = `Customer created successfully. Customer ID: ${customer.id}`;
+          this.notice =
+            `Customer created successfully. Customer ID: ${customer.id}`;
         },
         error: (err) => this.handleError(err),
       });
@@ -304,12 +342,16 @@ export class AppComponent implements OnInit {
 
           this.policies = [
             policy,
-            ...this.policies.filter((item) => item.id !== policy.id),
+            ...this.policies.filter(
+              (item) => item.id !== policy.id,
+            ),
           ];
 
-          this.notice = `Policy booking completed. Policy ID: ${policy.id} (${policy.policyNumber}).`;
+          this.notice =
+            `Policy booking completed. Policy ID: ${policy.id} (${policy.policyNumber}).`;
 
-          this.loadPolicies(this.activeAgentId, false);
+          // Reload policies, transactions and account credit information.
+          this.loadAccounts();
         },
         error: (err) => this.handleError(err),
       });
@@ -334,10 +376,12 @@ export class AppComponent implements OnInit {
       .pipe(finalize(() => (this.busy = false)))
       .subscribe({
         next: (result) => {
-          this.notice = `Payment result: ${result.status}. ${result.message || ""}`;
+          this.notice =
+            `Payment result: ${result.status}. ${result.message || ""}`;
 
+          // Reload all data affected by the payment.
           this.loadPolicies(policy.agentId, false);
-          this.loadTransactions(policy.agentId, false);
+          this.loadAccounts();
         },
         error: (err) => this.handleError(err),
       });
@@ -346,7 +390,9 @@ export class AppComponent implements OnInit {
   private addAccount(account: Account): void {
     this.accounts = [
       account,
-      ...this.accounts.filter((item) => item.id !== account.id),
+      ...this.accounts.filter(
+        (item) => item.id !== account.id,
+      ),
     ];
   }
 

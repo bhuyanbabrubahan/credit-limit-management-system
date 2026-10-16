@@ -6,6 +6,7 @@ import com.example.creditlimit.mapper.DtoMapper;
 import com.example.creditlimit.repository.PolicyRepository;
 import com.example.creditlimit.service.PolicyService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,11 @@ public class PolicyServiceImpl implements PolicyService {
     @Transactional(readOnly = true)
     public List<PolicyResponse> byAgent(Long agentId) {
 
-        return policies.findByAgentIdOrderByCreatedAtDesc(agentId)
+    	var policyList = policies.findByAgentIdOrderByCreatedAtDesc(agentId);
+    	
+		policyList.forEach(policy -> System.out.println("Policy Entity: " + policy));
+    	
+        return policyList
                 .stream()
                 .map(mapper::policy)
                 .toList();
@@ -39,7 +44,11 @@ public class PolicyServiceImpl implements PolicyService {
     @Transactional(readOnly = true)
     public List<PolicyResponse> byCustomer(Long customerId) {
 
-        return policies.findByCustomerIdOrderByCreatedAtDesc(customerId)
+    	var policyList = policies.findByCustomerIdOrderByCreatedAtDesc(customerId);
+    	
+    	policyList.forEach(policy -> System.out.println("Customer Policy Entity" + policy));
+    	
+        return policyList
                 .stream()
                 .map(mapper::policy)
                 .toList();
@@ -49,11 +58,11 @@ public class PolicyServiceImpl implements PolicyService {
     @Transactional(readOnly = true)
     public PolicyResponse get(Long policyId) {
 
-        return mapper.policy(
-                policies.findById(policyId)
-                        .orElseThrow(() ->
-                                new BusinessException(
-                                        "Policy not found: " + policyId,
-                                        org.springframework.http.HttpStatus.NOT_FOUND)));
+		var policy = policies.findById(policyId)
+				.orElseThrow(() -> new BusinessException("Policy not found: " + policyId, HttpStatus.NOT_FOUND));
+		
+		System.out.println("Policy by ID: " + policy);
+
+		return mapper.policy(policy);
     }
 }

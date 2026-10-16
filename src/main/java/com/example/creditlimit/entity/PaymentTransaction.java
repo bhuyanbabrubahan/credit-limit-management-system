@@ -157,4 +157,13 @@ public class PaymentTransaction extends BaseEntity {
     public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
     }
+
+	@Override
+	public String toString() {
+		return "PaymentTransaction [transactionId=" + transactionId + ", idempotencyKey=" + idempotencyKey + ", policy="
+				+ policy + ", customer=" + customer + ", agent=" + agent + ", amount=" + amount + ", paidAmount="
+				+ paidAmount + ", status=" + status + ", gatewayReference=" + gatewayReference + ", failureReason="
+				+ failureReason + ", paymentDate=" + paymentDate + "]";
+	}
+    
 }

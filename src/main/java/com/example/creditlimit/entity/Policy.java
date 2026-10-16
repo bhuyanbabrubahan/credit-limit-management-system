@@ -174,4 +174,14 @@ public class Policy extends BaseEntity {
     public void setStatus(PolicyStatus status) {
         this.status = status;
     }
+
+	@Override
+	public String toString() {
+		return "Policy [policyNumber=" + policyNumber + ", quotationNumber=" + quotationNumber + ", acdNumber="
+				+ acdNumber + ", agent=" + agent + ", customer=" + customer + ", premiumAmount=" + premiumAmount
+				+ ", paidAmount=" + paidAmount + ", policyStartDate=" + policyStartDate + ", policyEndDate="
+				+ policyEndDate + ", nextDueDate=" + nextDueDate + ", status=" + status + "]";
+	}
+    
+    
 }
