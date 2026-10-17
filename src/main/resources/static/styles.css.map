@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/styles.css"],
+  "sourcesContent": ["@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');\n:root{--canvas:#f6f7fb;--ink:#242b40;--muted:#8a94a7;--line:#e7eaf2;--brand:#6264df}\n*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--canvas);color:var(--ink);font-family:'DM Sans',Inter,Arial,sans-serif;font-size:13px}button,input,textarea,select{font-family:inherit}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #9698ff;outline-offset:2px}::selection{background:#dadcff;color:#252b48}\n"],
+  "mappings": ";;;AACA;AAAM,WAAS;AAAQ,QAAM;AAAQ,UAAQ;AAAQ,SAAO;AAAQ,UAAQ;AAAO;AACnF;AAAE,cAAW;AAAU;AAAC;AAAK;AAAK,UAAO;AAAE,cAAW;AAAK,cAAW,IAAI;AAAU,SAAM,IAAI;AAAO;AAAA,IAAY,SAAS;AAAA,IAAC,KAAK;AAAA,IAAC,KAAK;AAAA,IAAC;AAAW,aAAU;AAAI;AAAC;AAAO;AAAM;AAAS;AAAO,eAAY;AAAO;AAAC,MAAM;AAAe,KAAK;AAAe,QAAQ;AAAe,MAAM;AAAe,WAAQ,IAAI,MAAM;AAAQ,kBAAe;AAAG;AAAC;AAAY,cAAW;AAAQ,SAAM;AAAO;",
+  "names": []
+}

@@ -1,0 +1,46 @@
+@import "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap";
+
+/* src/styles.css */
+:root {
+  --canvas:#f6f7fb;
+  --ink:#242b40;
+  --muted:#8a94a7;
+  --line:#e7eaf2;
+  --brand:#6264df;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family:
+    "DM Sans",
+    Inter,
+    Arial,
+    sans-serif;
+  font-size: 13px;
+}
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #9698ff;
+  outline-offset: 2px;
+}
+::selection {
+  background: #dadcff;
+  color: #252b48;
+}
+
+/* angular:styles/global:styles */
+/*# sourceMappingURL=styles.css.map */
